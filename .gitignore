@@ -1,0 +1,4 @@
+*__pycache__
+*/migrations/0*
+db.sqlite3
+keyconfig.py
