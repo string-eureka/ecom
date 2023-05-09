@@ -10,8 +10,7 @@ class BaseUser(AbstractUser):
     ]
 
     user_type = models.CharField(max_length=2,choices=USER_TYPE_CHOICES,default='CS')
-    first_name = models.CharField( max_length=100)
-    last_name = models.CharField( max_length=100)
+    name = models.CharField( max_length=100)
     phone_number = models.CharField(max_length=12)
     address = models.CharField( max_length=255)
 
