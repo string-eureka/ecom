@@ -2,3 +2,4 @@
 */migrations/0*
 db.sqlite3
 keyconfig.py
+media/*/*
