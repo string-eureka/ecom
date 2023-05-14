@@ -56,6 +56,28 @@
             {% endif %}
             {% block content %}{% endblock %}
           </div>
+          {% if user.is_authenticated %}
+          <div class="col-md-4">
+            <div class="content-section">
+              <h3>Our Sidebar</h3>
+              <p class='text-muted'>You can put any information here you'd like.
+                <ul class="list-group">
+                  {% if user.user_type == 'CS' %}
+                  <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="#">Order History</a></li>
+                  <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="#">Wishlist</a></li>
+                  <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="#">Shopping List</a></li>
+                  <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="#">Wallet</a></li>
+                  {% elif user.user_type == 'VN' %}
+                  <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'add-item' %}">Add Products</a></li>
+                  <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="#">Orders Recieved</a></li>
+                  <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="#">Your Items</a></li>
+                  <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="#">etc</a></li>
+                  {% endif %}
+                </ul>
+              </p>
+            </div>
+          </div>
+          {% endif %}
         </div>
       </main>
     </main>

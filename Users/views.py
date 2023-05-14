@@ -5,16 +5,15 @@ from .models import BaseUser, CustomerUser, VendorUser
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from .decorators import customer_check,vendor_check
-    
-@login_required(login_url='login')
-@customer_check
-def home(request):
-    return render(request, 'Users/home.html')
 
-@login_required(login_url='login')
-@vendor_check
-def dashboard(request):
-    return render(request, 'Users/dashboard.html')
+def login_redirect(request):
+    if request.user.is_authenticated==False:
+        return redirect('login')
+    elif request.user.user_type=='CS':
+        return redirect(reverse_lazy('home'))
+    else: 
+        return redirect(reverse_lazy('dashboard'))
+    
 
 def registerone(request):
     return render(request, 'Users/role.html')
@@ -51,14 +50,10 @@ def register(request):
         form = UserRegisterForm()
     return render(request, 'Users/register.html', {'form': form})
 
-@login_required(login_url='login')
+
+@login_required
 def profile(request): #Expand to 2 different views for Customer and Vendor
     return render (request,'Users/profile.html')
 
-def login_redirect(request):
-    if request.user.is_authenticated==False:
-        return redirect('login')
-    elif request.user.user_type=='CS':
-        return redirect(reverse_lazy('home'))
-    else: 
-        return redirect(reverse_lazy('dashboard'))
+
+

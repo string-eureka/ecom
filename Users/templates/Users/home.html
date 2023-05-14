@@ -1,4 +1,8 @@
 {% extends "Users/base.html" %}
 {% block content %}
     <h1>User Homepage</h1>
+    {% for item in items %}
+    {{ item.item_title }}
+    {% endfor %}
+
 {% endblock content %}
