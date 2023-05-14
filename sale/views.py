@@ -4,29 +4,37 @@ from .models import Item
 from Users.decorators import vendor_check,customer_check
 from django.views.generic import CreateView
 from django.utils.decorators import method_decorator
+from django.contrib import messages
 
 
 @vendor_check
 def dashboard(request):
     return render(request, 'Users/dashboard.html')
 
+@vendor_check
+def vendor_items(request):
+    context={'items':Item.objects.filter(vendor=request.user.id)}
+    return render(request,'sale/vendor_items.html',context=context)
+
 @customer_check
 def home(request):
-    context = {'items': Item.objects.all()}
+    context = {'items': Item.objects.order_by('-item_orders')}
     return render(request, 'Users/home.html', context=context)
 
 
 @method_decorator(vendor_check,name='dispatch')
 class AddItem(CreateView):
-    model=Item
-    fields=['item_title','item_price','item_description','item_image','item_stock']
-    
+    model = Item
+    fields = ['item_title', 'item_price', 'item_description', 'item_image', 'item_stock']
+
     def form_valid(self, form):
         form.instance.vendor = self.request.user.vendor
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        messages.success(self.request, 'Item added successfully')
+        return response
 
     def get_success_url(self):
-       return reverse('add-item')
-    
+        return reverse('add-item')
+
 
 

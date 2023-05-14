@@ -1,0 +1,8 @@
+{% extends "Users/base.html" %}
+{% block content %}
+    <h1>Your Products</h1>
+    {% for item in items %}
+    {{ item.item_title }}
+    {% endfor %}
+
+{% endblock content %}

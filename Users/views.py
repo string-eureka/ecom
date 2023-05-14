@@ -6,8 +6,12 @@ from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from .decorators import customer_check,vendor_check
 
+def storefront(request):
+    return render(request,'Users/front.html')
+
 def login_redirect(request):
     if request.user.is_authenticated==False:
+        messages.warning(request,'You need to login before visiting that page')
         return redirect('login')
     elif request.user.user_type=='CS':
         return redirect(reverse_lazy('home'))

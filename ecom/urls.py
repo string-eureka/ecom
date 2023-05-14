@@ -18,9 +18,10 @@ from django.contrib import admin
 from django.urls import path,include
 from django.conf import settings
 from django.conf.urls.static import static 
-
+from Users.views import storefront
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('',storefront, name='front'),
     path('',include('Users.urls')),
     path('',include('sale.urls')),
 ]   

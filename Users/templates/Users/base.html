@@ -20,7 +20,7 @@
     <header class="site-header">
       <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
         <div class="container">
-          <a class="navbar-brand mr-4" href="{% url 'login-redirect' %}">Homepage</a>
+          <a class="navbar-brand mr-4" href="{% url 'login-redirect' %}">EurekaMart</a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
           </button>
@@ -70,7 +70,7 @@
                   {% elif user.user_type == 'VN' %}
                   <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'add-item' %}">Add Products</a></li>
                   <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="#">Orders Recieved</a></li>
-                  <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="#">Your Items</a></li>
+                  <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'vendor-items' %}">Your Products</a></li>
                   <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="#">etc</a></li>
                   {% endif %}
                 </ul>
