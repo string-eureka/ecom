@@ -1,13 +1,17 @@
 {% extends "Users/base.html" %}
 {% load crispy_forms_tags %}
 {% block content %}
-    <div class="content-section">
-      <div class="media">
-        <div class="media-body">
-          <h2 class="account-heading">{{ user.username }}</h2>
-          <p class="text-secondary">{{ user.email }}</p>
-        </div>
-      </div>
-      <!-- FORM HERE -->
+<div class="container">
+  <div class="card">
+    <div class="card-body">
+      <h2 class="card-title">{{ user.username }}</h2>
+      <p class="card-text"><strong>Name:</strong> {{ user.name }}</p>
+      <p class="card-text"><strong>Email:</strong> {{ user.email }}</p>
+      <p class="card-text"><strong>Phone Number:</strong> {{ user.phone_number }}</p>
+      <p class="card-text"><strong>Address:</strong> {{ user.address }}</p>
+      <a class="btn btn-primary" href="{% url 'edit-profile'%}">Edit</a>
     </div>
+  </div>
+  <!-- FORM HERE -->
+</div>
 {% endblock content %}
