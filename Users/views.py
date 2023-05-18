@@ -7,7 +7,11 @@ from django.contrib.auth.decorators import login_required
 from .decorators import customer_check,vendor_check
 
 def storefront(request):
-    return render(request,'Users/front.html')
+    if request.user.is_authenticated==True:
+        return redirect('login-redirect')
+    else:
+        return render(request,'Users/front.html')
+
 
 def login_redirect(request):
     if request.user.is_authenticated==False:
@@ -21,6 +25,7 @@ def login_redirect(request):
 
 def registerone(request):
     return render(request, 'Users/role.html')
+
 
 def register(request):
     if request.method == 'POST':

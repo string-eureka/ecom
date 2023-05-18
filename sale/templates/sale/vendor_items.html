@@ -1,17 +1,38 @@
 {% extends "Users/base.html" %}
 
 {% block content %}
+<style>
+    .card-img-container {
+        position: relative;
+        width: 100%;
+        padding-bottom: 100%;
+    }
+
+    .card-img-container img {
+        position: absolute;
+        object-fit: cover;
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
 <div class="container">
   <h1>Your Products</h1>
   <div class="row">
     {% for item in items %}
     <div class="col-md-4 mb-4">
       <div class="card">
-        <img src="{{ item.item_image.url }}" class="card-img-top" alt="{{ item.item_title }}">
+        <div class="card-img-container">
+          <img src="{{ item.item_image.url }}" alt="{{ item.item_title }}">
+        </div>
         <div class="card-body">
           <h5 class="card-title">{{ item.item_title }}</h5>
           <p class="card-text">{{ item.item_description }}</p>
+          {% if item.item_discount %}
+          <p class="card-text">Price: <s>${{ item.item_price }}</s> ${{ item.discounted_price }}</p>
+          {% else %}
           <p class="card-text">Price: ${{ item.item_price }}</p>
+          {% endif %}
           <p class="card-text">Stock: {{ item.item_stock }}</p>
           <p class="card-text">Orders: {{ item.item_orders }}</p>
           <a class="btn btn-primary" href="{% url 'edit-item' item.pk %}">Edit</a>
