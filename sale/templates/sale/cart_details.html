@@ -1,0 +1,35 @@
+{% extends 'Users/base.html' %}
+
+{% block content %}
+  <h1>Your Cart</h1>
+
+  {% if cart.cart_items.all %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Quantity</th>
+          <th>Price</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cart_item in cart_items %}
+          <tr>
+            <td>{{ cart_item.item.item_title }}</td>
+            <td>{{ cart_item.quantity }}</td>
+            <td>${{ cart_item.item.selling_price }}</td>
+            <td>${{ cart_item.total_iprice }}</td>
+            <td><a href="{% url 'removed-item' cart_item_id %}"> x </a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <h3>Total: ${{ cart.calculate_bill }}</h3>
+    <h5>You saved ${{ saving }} with EurekaMart today, Yay! </h5>
+    <a href="#" class="btn btn-primary">Proceed to Checkout</a>
+  {% else %}
+    <p>Your cart is empty.</p>
+  {% endif %}
+
+{% endblock %}

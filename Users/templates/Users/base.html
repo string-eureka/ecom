@@ -27,7 +27,7 @@
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto">
               {% if user.user_type == 'CS' %}
-              <a class="nav-item nav-link" href="#">Shopping Cart</a>
+              <a class="nav-item nav-link" href="{% url 'cart-details' %}">Shopping Cart</a>
               <a class="nav-item nav-link" href="#">Wishlist</a>
               <a class="nav-item nav-link" href="#">Order History</a>
               <a class="nav-item nav-link" href="#">Lucky Draw</a>
@@ -74,7 +74,7 @@
                   {% if user.user_type == 'CS' %}
                   <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="#">Order History</a></li>
                   <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="#">Wishlist</a></li>
-                  <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="#">Shopping List</a></li>
+                  <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'cart-details' %}">Shopping Cart</a></li>
                   <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="#">Wallet</a></li>
                   {% elif user.user_type == 'VN' %}
                   <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'add-item' %}">Add Products</a></li>

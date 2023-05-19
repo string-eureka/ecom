@@ -10,5 +10,8 @@ urlpatterns=[
     path('delete-item/<int:pk>/', sale_views.DeleteItem.as_view(), name='delete-item'),
     path('add-money/', sale_views.AddMoney.as_view(), name='add-money'),
     path('item/<int:item_id>/', sale_views.item_detail, name='item-detail'),
+    path('add-to-cart/<int:item_id>/', sale_views.add_to_cart, name='add-to-cart'),
+    path('your-cart/',sale_views.cart_details,name='cart-details'),
+    path('item/removed/<int:cart_item_id>/',sale_views.remove_from_cart,name='removed-item'),
 
 ]

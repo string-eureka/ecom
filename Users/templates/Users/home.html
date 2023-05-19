@@ -27,10 +27,11 @@
           <h5 class="card-title"><a href="{% url 'item-detail' item.pk %}">{{ item.item_title }}</a></h5>
           <p class="card-text">{{ item.item_description }}</p>
           {% if item.item_discount %}
-          <p class="card-text">Price: <s>${{ item.item_price }}</s> ${{ item.discounted_price }}</p>
+          <p class="card-text">Price: <s>${{ item.item_price }}</s> ${{ item.selling_price }}</p>
           {% else %}
           <p class="card-text">Price: ${{ item.item_price }}</p>
           {% endif %}
+          <a class="btn btn-primary btn-sm" href="{% url 'add-to-cart' item.pk %}">Add to Cart</a>       <a class="btn btn-warning btn-sm" href="#">Wishlist</a>
         </div>
       </div>
     </div>
