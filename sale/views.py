@@ -1,10 +1,11 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from django.urls import reverse,reverse_lazy
-from .models import Item
+from .models import Item,Cart,CartItem
 from Users.decorators import vendor_check,customer_check
 from django.views.generic import CreateView,DeleteView,UpdateView,FormView
 from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import AddMoneyForm
 
@@ -77,7 +78,6 @@ class DeleteItem(VendorCheckMixin,DeleteView):
         return reverse('vendor-items')
 
 
-
 @method_decorator(customer_check, name='dispatch')
 class AddMoney(FormView):
     form_class = AddMoneyForm
@@ -93,7 +93,17 @@ class AddMoney(FormView):
 
     def get_success_url(self):
         return reverse('profile')
-      
+
+@login_required
+def item_detail(request, item_id):
+    item = get_object_or_404(Item, pk=item_id)
+    discounted_price = item.item_price - ((item.item_price * item.item_discount) / 100)
+    context = {
+        'item': item,
+        'discounted_price': discounted_price,
+    }
+    return render(request, 'sale/item_detail.html', context)
+
 
 
 

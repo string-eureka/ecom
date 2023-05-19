@@ -26,7 +26,7 @@
           <img src="{{ item.item_image.url }}" alt="{{ item.item_title }}">
         </div>
         <div class="card-body">
-          <h5 class="card-title">{{ item.item_title }}</h5>
+          <h5 class="card-title"><a href="{% url 'item-detail' item.pk %}">{{ item.item_title }}</a></h5>
           <p class="card-text">{{ item.item_description }}</p>
           {% if item.item_discount %}
           <p class="card-text">Price: <s>${{ item.item_price }}</s> ${{ item.discounted_price }}</p>
