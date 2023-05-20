@@ -12,7 +12,9 @@ def vendor_check(function):
 
 def customer_check(function):
     def wrapper(request, *args, **kwargs):
-        if request.user.is_authenticated and request.user.user_type == 'CS':
+        if request.user.is_superuser:
+            return redirect('front')
+        if request.user.is_authenticated and request.user.user_type == 'CS': 
             return function(request, *args, **kwargs)
         else:
             messages.warning(request, 'You must be a customer to access this page.') 

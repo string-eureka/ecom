@@ -1,0 +1,14 @@
+{% extends 'Users/base.html' %}
+
+{% block content %}
+  <h1>Remove from Cart</h1>
+
+  <p>Are you sure you want to remove "{{ cart_item.item.item_title }}" from your cart?</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Remove</button>
+    <a href="{% url 'cart-details' %}" class="btn btn-secondary">Cancel</a>
+  </form>
+
+{% endblock %}

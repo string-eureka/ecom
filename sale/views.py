@@ -9,10 +9,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import AddMoneyForm,AddToCartForm
 
-class VendorCheckMixin(UserPassesTestMixin):
+class VendorCheckMixin(UserPassesTestMixin): # Fix
     def test_func(self):
         item = self.get_object()
-        return self.request.user.is_authenticated and item.vendor == self.request.user.vendor
+        return self.request.user.is_authenticated and item.vendor == self.request.user.vendor and not self.request.user.is_superuser 
     
     def handle_no_permission(self):
         if self.raise_exception or self.request.user.is_authenticated:
@@ -23,7 +23,7 @@ class VendorCheckMixin(UserPassesTestMixin):
 class CustomerCheckMixin(UserPassesTestMixin):
     def test_func(self):
         item = self.get_object()
-        return self.request.user.is_authenticated and item.customer == self.request.user.customer
+        return self.request.user.is_authenticated and item.customer == self.request.user.customer and not self.request.user.is_superuser 
     
     def handle_no_permission(self):
         if self.raise_exception or self.request.user.is_authenticated:
@@ -108,7 +108,7 @@ def item_detail(request, item_id):
     }
     return render(request, 'sale/item_detail.html', context)
 
-
+@customer_check
 def add_to_cart(request, item_id):
     item = get_object_or_404(Item, pk=item_id)
     cart,created = Cart.objects.get_or_create(owner=request.user.customer)
@@ -137,26 +137,30 @@ def add_to_cart(request, item_id):
         }
     return render(request, 'sale/add_to_cart.html', context=context)
 
-
+@customer_check
 def remove_from_cart(request, cart_item_id):
     cart_item = get_object_or_404(CartItem, pk=cart_item_id)
+    
     if request.method == 'POST':
         cart_item.delete()
+        messages.success(request, f'{cart_item.item.item_title} removed from cart.')
         return redirect('cart-details')
+    
     context = {
         'cart_item': cart_item
     }
-    messages.success(request,f'{cart_item.item.item_title} removed from cart.')
-    return render(request, 'sale/cart_details.html', context)
+    
+    return render(request, 'sale/remove_from_cart.html', context)
 
 
+@customer_check
 def cart_details(request):
     cart = get_object_or_404(Cart, owner=request.user.customer)
     cart_items = cart.cart_items.all()
     saving=0
     for cart_item in cart_items:
         cart_item.total_iprice = cart_item.item.selling_price * cart_item.quantity
-        saving+=(cart_item.item.item_price - cart_item.item.selling_price)
+        saving+=((cart_item.item.item_price - cart_item.item.selling_price)*cart_item.quantity)
         
     context = {
         'cart': cart,

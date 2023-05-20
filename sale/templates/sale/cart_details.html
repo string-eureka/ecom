@@ -20,8 +20,8 @@
             <td>{{ cart_item.quantity }}</td>
             <td>${{ cart_item.item.selling_price }}</td>
             <td>${{ cart_item.total_iprice }}</td>
-            <td><a href="{% url 'removed-item' cart_item_id %}"> x </a></td>
-          </tr>
+            <td><a href="{% url 'removed-item' cart_item.pk %}">x</a></td>
+        </tr>
         {% endfor %}
       </tbody>
     </table>

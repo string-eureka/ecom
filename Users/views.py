@@ -7,20 +7,22 @@ from django.contrib.auth.decorators import login_required
 from .decorators import customer_check,vendor_check
 
 def storefront(request):
-    if request.user.is_authenticated==True:
+    if request.user.is_authenticated==True and not request.user.is_superuser:
         return redirect('login-redirect')
     else:
         return render(request,'Users/front.html')
 
-
 def login_redirect(request):
-    if request.user.is_authenticated==False:
-        messages.warning(request,'You need to login before visiting that page')
+    if not request.user.is_authenticated:
+        messages.warning(request, 'You need to login before visiting that page')
         return redirect('login')
-    elif request.user.user_type=='CS':
-        return redirect(reverse_lazy('home'))
-    else: 
-        return redirect(reverse_lazy('dashboard'))
+    elif request.user.is_superuser:
+        messages.warning(request,'An admin is not allowed to perform that action')
+        return redirect('front')  
+    elif request.user.user_type == 'CS':
+        return redirect('home')
+    else:
+        return redirect('dashboard')
     
 
 def registerone(request):
