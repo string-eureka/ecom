@@ -1,0 +1,12 @@
+{% extends 'Users/base.html' %}
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+          <h2 class="card-title">Wallet</h2>
+          <p class="card-text"><strong>Current balance</strong> ${{ user.balance }}</p>
+          <a class="btn btn-primary" href="{% url 'add-money'%}">Add Money</a>
+        </div>
+      </div>
+</div>
+{% endblock %}

@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.contrib import admin
 from django.core.validators import MinValueValidator
 
 class BaseUser(AbstractUser):
@@ -14,7 +13,10 @@ class BaseUser(AbstractUser):
     name = models.CharField( max_length=100)
     phone_number = models.CharField(max_length=12)
     address = models.CharField( max_length=255)
-    balance = models.DecimalField(default=0,max_digits=10, decimal_places=2,validators=[MinValueValidator(limit_value=0,message='You must specify a positive amount')])
+    balance = models.DecimalField(default=0,
+                                  max_digits=19, 
+                                  decimal_places=2,
+                                  validators=[MinValueValidator(limit_value=0,message='You must specify a positive amount')])
 
     def __str__(self):  
         return f'[{self.username}]'

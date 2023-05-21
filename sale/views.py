@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.urls import reverse,reverse_lazy
-from .models import Item,Cart,CartItem,Order
+from .models import Item,Cart,CartItem
 from Users.decorators import vendor_check,customer_check
 from django.views.generic import CreateView,DeleteView,UpdateView,FormView
 from django.utils.decorators import method_decorator
@@ -8,6 +8,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import AddMoneyForm,AddToCartForm
+from decimal import Decimal, InvalidOperation
 
 class VendorCheckMixin(UserPassesTestMixin): # Fix
     def test_func(self):
@@ -49,6 +50,10 @@ def home(request):
     context = {'items': items}
     return render(request, 'Users/home.html', context=context)
 
+@customer_check
+def wallet(request):
+    return render(request,'sale/wallet.html')
+
 
 @method_decorator(vendor_check,name='dispatch')
 class AddItem(CreateView):
@@ -62,7 +67,7 @@ class AddItem(CreateView):
         return response
 
     def get_success_url(self):
-        return reverse('add-item')
+        return reverse('vendor-items')
     
 
 @method_decorator(vendor_check,name='dispatch')
@@ -72,6 +77,7 @@ class EditItem(VendorCheckMixin,UpdateView):
     template_name_suffix = '_update'
 
     def get_success_url(self):
+        messages.success(self.request,'Item updated successfully')
         return reverse('vendor-items')
 
 
@@ -81,6 +87,7 @@ class DeleteItem(VendorCheckMixin,DeleteView):
     template_name_suffix = '_delete'
 
     def get_success_url(self):
+        messages.success(self.request,'Item deleted successfully')
         return reverse('vendor-items')
 
 
@@ -90,15 +97,23 @@ class AddMoney(FormView):
     template_name = 'sale/add_money.html'
 
     def form_valid(self, form):
-        amount = form.cleaned_data['balance']
+        balance = form.cleaned_data['balance']
         user = self.request.user
-        user.balance += amount
-        user.save()
-        messages.success(self.request, f'${amount} added to your account!')
-        return super().form_valid(form)
+        try:
+            new_balance = user.balance + Decimal(balance)
+            if new_balance < 0 or new_balance > 10 ** 17:
+                raise InvalidOperation("Invalid balance")
+            user.balance = new_balance
+            user.save()
+            messages.success(self.request, f'${balance} added to your account!')
+            return super().form_valid(form)
+        except InvalidOperation as e:
+            form.add_error('balance', str(e))
+            return self.form_invalid(form)
 
     def get_success_url(self):
-        return reverse('profile')
+        return reverse('wallet')
+
 
 @login_required
 def item_detail(request, item_id):
@@ -170,3 +185,92 @@ def cart_details(request):
 
     return render(request, 'sale/cart_details.html', context=context)
 
+# @customer_check
+# def cart_details(request):
+#     cart = get_object_or_404(Cart, owner=request.user.customer)
+#     cart_items = cart.cart_items.all()
+#     saving=0
+#     for cart_item in cart_items:
+#         cart_item.total_iprice = cart_item.item.selling_price * cart_item.quantity
+#         saving+=((cart_item.item.item_price - cart_item.item.selling_price)*cart_item.quantity)
+        
+#     context = {
+#         'cart': cart,
+#         'cart_items': cart_items,
+#         'saving':saving,
+#     }
+
+#     return render(request, 'sale/cart_details.html', context=context)
+
+
+# @customer_check
+# def create_order(request):
+#     cart = get_object_or_404(Cart, owner=request.user.customer)
+#     total_bill = cart.calculate_bill()
+
+#     if request.method == "POST":
+#         if request.user.balance >= total_bill:
+#             order = cart.clear_cart()
+#             request.user.balance -= total_bill
+#             request.user.save()
+
+#             vendors = set(cart_item.item.vendor for cart_item in cart.cart_items.all())
+#             for vendor in vendors:
+#                 vendor.balance += sum(
+#                     cart_item.item.selling_price * cart_item.quantity
+#                     for cart_item in cart.cart_items.filter(item__vendor=vendor)
+#                 )
+#                 vendor.save()
+
+#             messages.success(request, "Order placed successfully!")
+#             return redirect("order-details", order.pk)
+#         else:
+#             messages.warning(request, "Insufficient balance to place the order.")
+#             return redirect("cart-details")
+
+#     context = {"cart": cart, "total_bill": total_bill}
+
+#     return render(request, "sale/create_order.html", context=context)
+
+
+# @customer_check
+# def order_details(request, order_id):
+#     order = get_object_or_404(Order, pk=order_id)
+#     order_items = order.order_items.all()
+
+#     context = {"order": order, "order_items": order_items}
+
+#     return render(request, "sale/order_details.html", context=context)
+
+
+# @customer_check
+# def order_history(request):
+#     orders = Order.objects.filter(owner=request.user.customer).order_by("-order_date")
+
+#     context = {"orders": orders}
+
+#     return render(request, "sale/order_history.html", context=context)
+
+
+# @vendor_check
+# def vendor_order_details(request, order_id):
+#     vendor = request.user.vendor
+#     order = get_object_or_404(Order, pk=order_id, order_items__item__vendor=vendor)
+
+#     order_items = order.order_items.filter(item__vendor=vendor)
+
+#     context = {"order": order, "order_items": order_items}
+
+#     return render(request, "sale/vendor_order_details.html", context=context)
+
+
+# @vendor_check
+# def vendor_order_history(request):
+#     vendor = request.user.vendor
+#     orders = Order.objects.filter(order_items__item__vendor=vendor).distinct().order_by(
+#         "-order_date"
+#     )
+
+#     context = {"orders": orders}
+
+#     return render(request, "sale/vendor_order_history.html", context=context)

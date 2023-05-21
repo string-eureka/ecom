@@ -17,7 +17,6 @@ def login_redirect(request):
         messages.warning(request, 'You need to login before visiting that page')
         return redirect('login')
     elif request.user.is_superuser:
-        messages.warning(request,'An admin is not allowed to perform that action')
         return redirect('front')  
     elif request.user.user_type == 'CS':
         return redirect('home')
