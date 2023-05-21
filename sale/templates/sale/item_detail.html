@@ -33,7 +33,7 @@
                 <a class="btn btn-danger" href="{% url 'delete-item' item.pk %}">Delete</a>
                 {% elif user.user_type == 'CS' %}
                 <a class="btn btn-primary" href="{% url 'add-to-cart' item.pk %}">Add to Cart</a>
-                <a class="btn btn-danger" href="#">Add to Wishlist</a>
+                <a class="btn btn-warning" href="#">Add to Wishlist</a>
                 {% endif %}
             </div>
         </div>

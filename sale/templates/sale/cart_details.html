@@ -27,7 +27,7 @@
     </table>
     <h3>Total: ${{ cart.calculate_bill }}</h3>
     <h5>You saved ${{ saving }} with EurekaMart today, Yay! </h5>
-    <a href="#" class="btn btn-primary">Proceed to Checkout</a>
+    <a href="{% url 'create-order' %}" class="btn btn-primary">Proceed to Checkout</a>
   {% else %}
     <p>Your cart is empty.</p>
   {% endif %}

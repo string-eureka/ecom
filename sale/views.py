@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.urls import reverse,reverse_lazy
-from .models import Item,Cart,CartItem
+from .models import Item,Cart,CartItem,Order,OrderItem
 from Users.decorators import vendor_check,customer_check
 from django.views.generic import CreateView,DeleteView,UpdateView,FormView
 from django.utils.decorators import method_decorator
@@ -9,8 +9,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import AddMoneyForm,AddToCartForm
 from decimal import Decimal, InvalidOperation
+from django.db import transaction
+from django.db.models import F
 
-class VendorCheckMixin(UserPassesTestMixin): # Fix
+
+class VendorCheckMixin(UserPassesTestMixin): 
     def test_func(self):
         item = self.get_object()
         return self.request.user.is_authenticated and item.vendor == self.request.user.vendor and not self.request.user.is_superuser 
@@ -167,7 +170,6 @@ def remove_from_cart(request, cart_item_id):
     
     return render(request, 'sale/remove_from_cart.html', context)
 
-
 @customer_check
 def cart_details(request):
     cart = get_object_or_404(Cart, owner=request.user.customer)
@@ -185,92 +187,114 @@ def cart_details(request):
 
     return render(request, 'sale/cart_details.html', context=context)
 
-# @customer_check
-# def cart_details(request):
-#     cart = get_object_or_404(Cart, owner=request.user.customer)
-#     cart_items = cart.cart_items.all()
-#     saving=0
-#     for cart_item in cart_items:
-#         cart_item.total_iprice = cart_item.item.selling_price * cart_item.quantity
-#         saving+=((cart_item.item.item_price - cart_item.item.selling_price)*cart_item.quantity)
-        
-#     context = {
-#         'cart': cart,
-#         'cart_items': cart_items,
-#         'saving':saving,
-#     }
+@customer_check
+@transaction.atomic
 
-#     return render(request, 'sale/cart_details.html', context=context)
+def create_order(request):
+    cart = get_object_or_404(Cart, owner=request.user.customer)
+    total_bill = cart.calculate_bill()
+
+    if request.user.balance < total_bill:
+        messages.error(request, "Insufficient balance to place the order.")
+        return redirect('cart-details')
+    if total_bill > 10 ** 10:
+        messages.warning(request,'Income tax Bureau Incoming!')
+        return redirect('cart-details')
 
 
-# @customer_check
-# def create_order(request):
-#     cart = get_object_or_404(Cart, owner=request.user.customer)
-#     total_bill = cart.calculate_bill()
+    vendor_balances = {}
 
-#     if request.method == "POST":
-#         if request.user.balance >= total_bill:
-#             order = cart.clear_cart()
-#             request.user.balance -= total_bill
-#             request.user.save()
+    for cart_item in cart.cart_items.all():
+        if cart_item.item.item_stock < cart_item.quantity:
+            messages.warning(request, f"Insufficient stock for {cart_item.item.item_title}.")
+            return redirect('cart-details')
 
-#             vendors = set(cart_item.item.vendor for cart_item in cart.cart_items.all())
-#             for vendor in vendors:
-#                 vendor.balance += sum(
-#                     cart_item.item.selling_price * cart_item.quantity
-#                     for cart_item in cart.cart_items.filter(item__vendor=vendor)
-#                 )
-#                 vendor.save()
+        vendor = cart_item.item.vendor.user
+        vendor_balances[vendor] = vendor_balances.get(vendor, 0) + (cart_item.quantity * cart_item.item.selling_price)
 
-#             messages.success(request, "Order placed successfully!")
-#             return redirect("order-details", order.pk)
-#         else:
-#             messages.warning(request, "Insufficient balance to place the order.")
-#             return redirect("cart-details")
+        cart_item.item.item_stock -= cart_item.quantity
+        cart_item.item.item_orders += cart_item.quantity
+        cart_item.item.save()
 
-#     context = {"cart": cart, "total_bill": total_bill}
+    order = Order.objects.create(customer=request.user.customer, total_bill=total_bill)
+    order_items = []
 
-#     return render(request, "sale/create_order.html", context=context)
+    for cart_item in cart.cart_items.all():
+        order_item = OrderItem(
+            order=order,
+            item=cart_item.item,
+            quantity=cart_item.quantity,
+            item_price=cart_item.item.selling_price,
+            item_title=cart_item.item.item_title
+        )
+        order_items.append(order_item)
 
+    OrderItem.objects.bulk_create(order_items)
 
-# @customer_check
-# def order_details(request, order_id):
-#     order = get_object_or_404(Order, pk=order_id)
-#     order_items = order.order_items.all()
+    for vendor, balance_change in vendor_balances.items():
+        vendor.balance = F('balance') + balance_change
+        vendor.save()
 
-#     context = {"order": order, "order_items": order_items}
+    request.user.balance -= total_bill
+    request.user.save()
 
-#     return render(request, "sale/order_details.html", context=context)
+    cart.cart_items.all().delete()
+    messages.success(request, "Order placed successfully.")
+    return redirect('customer-order-details', order.pk)
 
-
-# @customer_check
-# def order_history(request):
-#     orders = Order.objects.filter(owner=request.user.customer).order_by("-order_date")
-
-#     context = {"orders": orders}
-
-#     return render(request, "sale/order_history.html", context=context)
-
-
-# @vendor_check
-# def vendor_order_details(request, order_id):
-#     vendor = request.user.vendor
-#     order = get_object_or_404(Order, pk=order_id, order_items__item__vendor=vendor)
-
-#     order_items = order.order_items.filter(item__vendor=vendor)
-
-#     context = {"order": order, "order_items": order_items}
-
-#     return render(request, "sale/vendor_order_details.html", context=context)
+@customer_check
+def customer_order_details(request, order_id):
+    order = get_object_or_404(Order, pk=order_id, customer=request.user.customer)
+    order_items = order.order_items.all()
+    saving=0
+    for order_item in order_items:
+        order_item.total_iprice = order_item.item_price * order_item.quantity
+    context = {
+        'order': order,
+        'order_items': order_items,
+    }
+    return render(request, 'sale/customer_order_details.html', context=context)
 
 
-# @vendor_check
-# def vendor_order_history(request):
-#     vendor = request.user.vendor
-#     orders = Order.objects.filter(order_items__item__vendor=vendor).distinct().order_by(
-#         "-order_date"
-#     )
+@customer_check
+def customer_order_history(request):
+    orders = Order.objects.filter(customer=request.user.customer)
 
-#     context = {"orders": orders}
+    context = {
+        'orders': orders,
+    }
+    return render(request, 'sale/customer_order_history.html', context=context)
 
-#     return render(request, "sale/vendor_order_history.html", context=context)
+@vendor_check
+def vendor_order_details(request, order_id):
+    order = get_object_or_404(Order, pk=order_id)
+    order_items = order.order_items.filter(item__vendor=request.user.vendor)
+    total_earned = sum(item.item_price * item.quantity for item in order_items)
+    for order_item in order_items:
+        order_item.total_iprice = order_item.item_price * order_item.quantity
+
+    context = {
+        'order': order,
+        'order_items': order_items,
+        'total_earned': total_earned,
+    }
+    return render(request, 'sale/vendor_order_details.html', context=context)
+
+@vendor_check
+def vendor_order_history(request):
+    orders = Order.objects.filter(order_items__item__vendor=request.user.vendor).distinct().order_by('-order_date')
+
+    order_data = []
+    for order in orders:
+        order_items = order.order_items.filter(item__vendor=request.user.vendor)
+        total_earned = sum(item.item_price * item.quantity for item in order_items)
+        order_data.append({
+            'order': order,
+            'total_earned': total_earned,
+        })
+
+    context = {
+        'order_data': order_data,
+    }
+    return render(request, 'sale/vendor_order_history.html', context=context)
+

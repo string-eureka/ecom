@@ -2,7 +2,6 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from PIL import Image
 from Users.models import VendorUser, CustomerUser
-from django.db import transaction
 
 
 class Item(models.Model):
@@ -33,37 +32,12 @@ class Item(models.Model):
 
 
 class Cart(models.Model):
-    owner = models.ForeignKey(CustomerUser, on_delete=models.CASCADE, related_name='carts')
-
+    owner = models.OneToOneField(CustomerUser, on_delete=models.CASCADE, related_name='cart')
     
     def calculate_bill(self):
         cart_items = self.cart_items.all()
         total_bill = sum(item.item.selling_price * item.quantity for item in cart_items)
         return total_bill
-
-
-    # def clear_cart(self):
-    #     with transaction.atomic():
-    #         cart_items = self.cart_items.all()
-    #         total_bill = self.calculate_bill()
-    #         order = Order.objects.create(owner=self.owner, total_bill=total_bill)
-
-    #         for cart_item in cart_items:
-    #             item = cart_item.item
-    #             vendor = item.vendor.user
-
-    #             Order.objects.create(
-    #                 owner=self.owner,
-    #                 item_title=item.item_title,
-    #                 item_price=item.item_price,  # Set the item_price value
-    #                 quantity_ordered=cart_item.quantity,
-    #                 vendor_name=vendor.username,
-    #                 vendor_phone_number=vendor.phone_number,
-    #                 vendor_address=vendor.address
-    #             )
-
-    #         self.cart_items.all().delete()
-    #     return order
 
     def __str__(self):
         return f"Cart #{self.pk} for {self.owner}"
@@ -78,17 +52,22 @@ class CartItem(models.Model):
         return f"{self.quantity} x {self.item.item_title} in Cart #{self.cart.pk}"
 
 
-# class Order(models.Model):
-#     owner = models.ForeignKey(CustomerUser, on_delete=models.CASCADE, related_name='orders')
-#     item=models.ForeignKey
-#     item_title = models.CharField(max_length=255)
-#     item_price = models.DecimalField(max_digits=10, decimal_places=2)
-#     quantity_ordered = models.PositiveSmallIntegerField(default=1)
-#     vendor_name = models.CharField(max_length=100)
-#     vendor_phone_number = models.CharField(max_length=12)
-#     vendor_address = models.CharField(max_length=255)
-#     order_date = models.DateTimeField(auto_now_add=True)
-#     total_bill = models.DecimalField(max_digits=10, decimal_places=2)
+class Order(models.Model):
+    customer = models.ForeignKey(CustomerUser, on_delete=models.CASCADE, related_name='orders')
+    total_bill = models.DecimalField(max_digits=10, decimal_places=2)
+    order_date = models.DateTimeField(auto_now_add=True)
+    # savings= models.DecimalField(max_digits=10, decimal_places=2)
 
-#     def __str__(self):
-#         return f"Order #{self.pk} for {self.owner}"
+    def __str__(self):
+        return f"Order #{self.pk} by {self.customer}"
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE,related_name='order_items')
+    item = models.ForeignKey(Item, on_delete=models.SET_NULL,related_name='sold_items',null=True)
+    quantity = models.PositiveSmallIntegerField(default=1)
+    item_price = models.DecimalField(max_digits=10, decimal_places=2)
+    item_title = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.quantity} x {self.item_title} in Order #{self.order.pk} for {self.order.customer}"

@@ -1,0 +1,33 @@
+{% extends 'Users/base.html' %}
+
+{% block content %}
+  <h1>Order History</h1>
+
+  {% if order_data %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Order Date</th>
+          <th>Customer</th>
+          <th>Total Earned</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for data in order_data %}
+          <tr>
+            <td>{{ data.order.pk }}</td>
+            <td>{{ data.order.order_date }}</td>
+            <td>{{ data.order.customer.user.username }}</td>
+            <td>${{ data.total_earned }}</td>
+            <td><a href="{% url 'vendor-order-details' data.order.pk %}">View Details</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No orders found.</p>
+  {% endif %}
+
+{% endblock %}

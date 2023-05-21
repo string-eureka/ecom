@@ -1,0 +1,47 @@
+{% extends 'Users/base.html' %}
+
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8 offset-md-2">
+        <h1>Order Details</h1>
+
+        <div class="card">
+          <div class="card-body">
+            <h6 class="card-subtitle mb-2 text-muted text-lg-right">Order ID: {{ order.pk }}</h6>
+            <h5 class="card-subtitle mb-2 text-muted text-lg-right">{{ order.order_date }}</h5>
+
+            <div class="mt-4">
+              <h3 class="mb-4">Items Ordered</h3>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for order_item in order_items %}
+                    <tr>
+                      <td>{{ order_item.item_title }}</td>
+                      <td>${{ order_item.item_price }}</td>
+                      <td>{{ order_item.quantity }}</td>
+                      <td>${{ order_item.total_iprice }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+
+            <div class="mt-4">
+              <h3>Total Bill: ${{ order.total_bill }}</h3><br><br>
+              <h7 class="card-subtitle mb-2 text-muted "> Order delivered at- {{ order.customer.user.address }}</h7>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
