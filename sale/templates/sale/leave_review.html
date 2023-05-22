@@ -1,0 +1,13 @@
+{% extends "Users/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="container">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form|crispy }}
+
+            <input class="btn btn-success" type="submit" value="Submit" />
+        </form>
+    </div>
+{% endblock content %}

@@ -1,6 +1,10 @@
 {% extends 'Users/base.html' %}
 {% block content %}
-  <h2>Add to Cart / Modify</h2>
+{% if item in cart_item %}
+  <h2>Modify Quantity </h2>
+{% else %}
+  <h2> Add to Cart</h2>
+{% endif %}
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}

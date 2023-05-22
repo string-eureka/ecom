@@ -19,5 +19,9 @@ urlpatterns=[
     path('order-history/', views.customer_order_history, name='customer-order-history'),
     path('vendor-order-history/', views.vendor_order_history, name='vendor-order-history'),
     path('vendor-order-details/<int:order_id>/', views.vendor_order_details, name='vendor-order-details'),
+    path('wishlist/',views.wishlist,name='wishlist'),
+    path('wishlist/add/<int:item_id>',views.add_to_wishlist,name='add-to-wishlist'),
+    path('wishlist/removed/<int:item_id>/',views.remove_from_wishlist,name='remove-from-wishlist'),
+    path('item/<int:item_id>/review/', views.leave_review, name='leave-review'),
 ]
 

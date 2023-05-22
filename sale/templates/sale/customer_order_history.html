@@ -10,7 +10,6 @@
           <th>Order ID</th>
           <th>Order Date</th>
           <th>Total Bill</th>
-          <th>Review</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -20,7 +19,6 @@
             <td>{{ order.pk }}</td>
             <td>{{ order.order_date }}</td>
             <td>${{ order.total_bill }}</td>
-            <td></td>
             <td><a href="{% url 'customer-order-details' order.pk %}">View Details</a></td>
           </tr>
         {% endfor %}

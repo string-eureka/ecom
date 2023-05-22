@@ -1,4 +1,3 @@
-<!-- item_detail.html -->
 {% extends "Users/base.html" %}
 
 {% block content %}
@@ -8,7 +7,6 @@
     height: 100%;
     object-fit: cover;
 }
-
 </style>
 <div class="card">
     <div class="row">
@@ -28,6 +26,9 @@
                 {% endif %}
                 <p class="card-text">Stock: {{ item.item_stock }}</p>
                 <p class="card-text">Orders: {{ item.item_orders }}</p>
+                {% if display_rating  %}
+                <p class="card-text">Rating: {{ display_rating }}/5</p>
+                {% endif %}
                 {% if user.user_type == 'VN' %}
                 <a class="btn btn-primary" href="{% url 'edit-item' item.pk %}">Edit</a>
                 <a class="btn btn-danger" href="{% url 'delete-item' item.pk %}">Delete</a>
@@ -39,4 +40,27 @@
         </div>
     </div>
 </div>
+
+{% if request.user.customer and has_ordered and not review_exists %}
+    <div class="card">
+        <div class="card-body">
+            <p>You have purchased this item.</p>
+            <a href="{% url 'leave-review' item.pk %}">Leave a review and rating</a>
+        </div>
+    </div>
+{% endif %}
+
+{% if reviews %}
+    <div class="card">
+        <div class="card-body">
+            <h3>Reviews</h3>
+            <ul>
+                {% for review in reviews %}
+                <li>{{ review.owner }} - Rating: {{ review.rating }} - {{ review.audit }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endif %}
+
 {% endblock content %}

@@ -31,7 +31,10 @@
           {% else %}
           <p class="card-text">Price: ${{ item.item_price }}</p>
           {% endif %}
-          <a class="btn btn-primary btn-sm" href="{% url 'add-to-cart' item.pk %}">Add to Cart</a>       <a class="btn btn-warning btn-sm" href="#">Wishlist</a>
+          {% if item.avg_rating  %}
+          <p class="card-text">Rating: {{ item.avg_rating }}/5</p>
+          {% endif %}
+          <a class="btn btn-primary btn-sm" href="{% url 'add-to-cart' item.pk %}">Add to Cart</a>       <a class="btn btn-warning btn-sm" href="{% url 'add-to-wishlist' item.pk %}">Wishlist</a>
         </div>
       </div>
     </div>

@@ -1,0 +1,30 @@
+{% extends 'Users/base.html' %}
+
+{% block content %}
+  <h1>Your Wishlist</h1>
+
+  {% if items %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Price</th>
+          <th>Add To cart</th>
+          <th>Remove</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+          <tr>
+            <td>{{ item.item_title }}</td>
+            <td>${{ item.selling_price }}</td>
+            <td><a href="{% url 'add-to-cart' item.pk %}" class="btn btn-success btn-sm">Add to Cart</a></td>
+            <td><a href="{% url 'remove-from-wishlist' item.pk %}" class="btn btn-danger btn-sm">Remove</a></td>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>Your wishlist is empty.</p>
+  {% endif %}
+
+{% endblock %}

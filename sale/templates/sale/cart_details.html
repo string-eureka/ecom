@@ -11,6 +11,7 @@
           <th>Quantity</th>
           <th>Price</th>
           <th>Total</th>
+          <th>Modify</th>
         </tr>
       </thead>
       <tbody>
@@ -20,6 +21,7 @@
             <td>{{ cart_item.quantity }}</td>
             <td>${{ cart_item.item.selling_price }}</td>
             <td>${{ cart_item.total_iprice }}</td>
+            <td><a class="btn btn-primary btn-sm" href="{% url 'add-to-cart' cart_item.item.pk %}">Modify</a></td>
             <td><a href="{% url 'removed-item' cart_item.pk %}">x</a></td>
         </tr>
         {% endfor %}
@@ -27,7 +29,7 @@
     </table>
     <h3>Total: ${{ cart.calculate_bill }}</h3>
     <h5>You saved ${{ saving }} with EurekaMart today, Yay! </h5>
-    <a href="{% url 'create-order' %}" class="btn btn-primary">Proceed to Checkout</a>
+    <a href="{% url 'create-order' %}" class="btn btn-success">Proceed to Checkout</a>
   {% else %}
     <p>Your cart is empty.</p>
   {% endif %}

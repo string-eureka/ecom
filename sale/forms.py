@@ -1,5 +1,6 @@
 from django import forms
 from Users.models import BaseUser
+from .models import Review
 class AddMoneyForm(forms.ModelForm):
     class Meta:
         model = BaseUser
@@ -16,3 +17,8 @@ class AddToCartForm(forms.Form):
         label='Quantity',
         widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter quantity'}),
     )
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ['rating', 'audit']

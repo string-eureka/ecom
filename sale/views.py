@@ -1,16 +1,16 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.urls import reverse,reverse_lazy
-from .models import Item,Cart,CartItem,Order,OrderItem
+from .models import Item,Cart,CartItem,Order,OrderItem,Wishlist,Review
 from Users.decorators import vendor_check,customer_check
 from django.views.generic import CreateView,DeleteView,UpdateView,FormView
 from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import AddMoneyForm,AddToCartForm
+from .forms import AddMoneyForm,AddToCartForm,ReviewForm
 from decimal import Decimal, InvalidOperation
 from django.db import transaction
-from django.db.models import F
+from django.db.models import F,Avg,Q
 
 
 class VendorCheckMixin(UserPassesTestMixin): 
@@ -49,11 +49,15 @@ def vendor_items(request):
 
 @customer_check
 def home(request):
-    items=Item.objects.order_by('-item_orders')
+    items = Item.objects.annotate(avg_rating=Avg('item_reviews__rating')).order_by('-item_orders')
+    for item in items:
+        if item.avg_rating is not None:
+            item.avg_rating = Decimal(item.avg_rating).quantize(Decimal('0.00'))
     context = {'items': items}
     return render(request, 'Users/home.html', context=context)
 
-@customer_check
+
+@login_required
 def wallet(request):
     return render(request,'sale/wallet.html')
 
@@ -121,8 +125,22 @@ class AddMoney(FormView):
 @login_required
 def item_detail(request, item_id):
     item = get_object_or_404(Item, pk=item_id)
+    average_rating = item.item_reviews.aggregate(avg_rating=Avg('rating'))['avg_rating']
+    display_rating= Decimal(average_rating).quantize(Decimal('0.00'))
+
+    reviews = item.item_reviews.all()
+    review_exists = Review.objects.filter(item=item, owner=request.user.customer).exists()
+
+    if request.user.user_type == 'CS':
+        has_ordered = Order.objects.filter(Q(customer=request.user.customer) & Q(order_items__item=item)).exists()
+    else:
+        has_ordered=False
     context = {
         'item': item,
+        'display_rating': display_rating,
+        'reviews': reviews,
+        'has_ordered':has_ordered,
+        'review_exists':review_exists,
     }
     return render(request, 'sale/item_detail.html', context)
 
@@ -143,7 +161,7 @@ def add_to_cart(request, item_id):
             else:
                 CartItem.objects.create(cart=cart, item=item, quantity=quantity)
                 messages.success(request, f"{quantity} {item.item_title} added to your cart.")
-            return redirect('home')
+            return redirect('cart-details')
     else:
         initial_quantity = cart_item.quantity if cart_item else 0
         form = AddToCartForm(initial={'quantity': initial_quantity})
@@ -172,7 +190,7 @@ def remove_from_cart(request, cart_item_id):
 
 @customer_check
 def cart_details(request):
-    cart = get_object_or_404(Cart, owner=request.user.customer)
+    cart,created = Cart.objects.get_or_create(owner=request.user.customer)
     cart_items = cart.cart_items.all()
     saving=0
     for cart_item in cart_items:
@@ -195,7 +213,7 @@ def create_order(request):
     total_bill = cart.calculate_bill()
 
     if request.user.balance < total_bill:
-        messages.error(request, "Insufficient balance to place the order.")
+        messages.warning(request, "Insufficient balance to place the order.")
         return redirect('cart-details')
     if total_bill > 10 ** 10:
         messages.warning(request,'Income tax Bureau Incoming!')
@@ -258,7 +276,7 @@ def customer_order_details(request, order_id):
 
 @customer_check
 def customer_order_history(request):
-    orders = Order.objects.filter(customer=request.user.customer)
+    orders = Order.objects.filter(customer=request.user.customer).order_by('-order_date')
 
     context = {
         'orders': orders,
@@ -298,3 +316,52 @@ def vendor_order_history(request):
     }
     return render(request, 'sale/vendor_order_history.html', context=context)
 
+@customer_check
+def add_to_wishlist(request, item_id):
+    item = get_object_or_404(Item, pk=item_id)
+    wishlist, created = Wishlist.objects.get_or_create(owner=request.user.customer)
+    wishlist.items.add(item)
+    messages.success(request, f"{item.item_title} added to your wishlist.")
+    return redirect('wishlist')
+
+@customer_check
+def remove_from_wishlist(request, item_id):
+    item = get_object_or_404(Item, pk=item_id)
+    wishlist = get_object_or_404(Wishlist, owner=request.user.customer)
+    wishlist.items.remove(item)
+    messages.success(request, f"{item.item_title} removed from your wishlist.")
+    return redirect('wishlist')
+
+@customer_check
+def wishlist(request):
+    wishlist,created = Wishlist.objects.get_or_create(owner=request.user.customer)
+    items = wishlist.items.all()
+    context = {'items': items}
+    return render(request, 'sale/wishlist.html', context=context)
+
+@customer_check
+def leave_review(request, item_id):
+    item = get_object_or_404(Item, pk=item_id)
+    review_exists = Review.objects.filter(item=item, owner=request.user.customer).exists()
+    
+    if review_exists:
+        messages.error(request, "You have already reviewed this item.")
+        return redirect('item-detail', item_id=item.id)
+
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.item = item
+            review.owner = request.user.customer
+            review.save()
+            messages.success(request, "Review submitted successfully.")
+            return redirect('item-detail', item_id=item.id)
+    else:
+        form = ReviewForm()
+
+    context = {
+        'item': item,
+        'form': form,
+    }
+    return render(request, 'sale/leave_review.html', context)
