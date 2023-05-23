@@ -1,5 +1,13 @@
 {% extends "Users/base.html" %}
 {% block content %}
-    <a class="ml-1" href="{% url 'creg' %}">Register as a Customer</a><br> 
-    <a class="ml-1" href="{% url 'vreg' %}">Register as a Vendor </a>
-{% endblock content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <a href="{% url 'creg' %}" class="btn btn-primary">Register as a Customer</a>
+            </div>
+            <div class="col-md-6">
+                <a href="{% url 'vreg' %}" class="btn btn-primary">Register as a Vendor</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

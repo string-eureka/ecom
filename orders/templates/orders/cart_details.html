@@ -31,7 +31,7 @@
         {% endfor %}
       </tbody>
     </table>
-    <h6 class="card-subtitle mb-2 text-muted text-lg-right">* indicates that the item is out of stock!</h6>
+    <h6 class="card-subtitle mb-2 text-muted text-lg-right">* indicates that the stock is lesser than the quantity!</h6>
     <h3>Total: ${{ cart.calculate_bill }}</h3>
     {% if cart.savings %}
     <h5>You will save ${{ cart.savings }} on this order! </h5>
