@@ -9,10 +9,14 @@
             </div>
         </div>
     </div>
+    {% if low_stock_items %}
     <h2>Items with Low Stock:</h2>
     <ul>
         {% for item in low_stock_items %}
             <li>{{ item.item_title }} - Stock: {{ item.item_stock }}</li>
         {% endfor %}
     </ul>
+    {% else %}
+        <p><h6> Everything's stocked up! Good Job! </h6></p>
+    {% endif %}
 {% endblock %}

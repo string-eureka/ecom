@@ -16,6 +16,7 @@
 </style>
 <div class="container">
   <h1>User Homepage</h1>
+  {% if items %}
   <form action="" method="get" class="mb-4">
     <label for="sort_by">Sort by:</label>
     <select name="sort_by" id="sort_by" onchange="this.form.submit()">
@@ -51,5 +52,11 @@
     </div>
     {% endfor %}
   </div>
+  {% else %}
+  <p>
+    <h3>Just like the old days, there's nobody here.</h3>
+    <h3>Add some items to get the party started!</h3>
+  </p>
+  {% endif %}
 </div>
 {% endblock content %}

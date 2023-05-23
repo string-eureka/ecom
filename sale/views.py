@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from django.urls import reverse,reverse_lazy
+from django.urls import reverse
 from .models import Item,Cart,CartItem,Order,OrderItem,Wishlist,Review
 from Users.decorators import vendor_check,customer_check
 from django.views.generic import CreateView,DeleteView,UpdateView,FormView
@@ -58,7 +58,6 @@ def vendor_items(request):
 def home(request):
     sort_by = request.GET.get('sort_by')
     items = Item.objects.all()
-
     if sort_by == 'orders':
         items = items.order_by('-item_orders')
     elif sort_by == 'price_low_high':
@@ -88,13 +87,12 @@ def wallet(request):
 
 @customer_check
 def random_item(request):
-    try:
-        random_item = Item.objects.order_by('?').first()  
-        if random_item:
-            return redirect('item-detail', item_id=random_item.id)
-    except Item.DoesNotExist:
+    random_item = Item.objects.order_by('?').first()  
+    if random_item:
+        return redirect('item-detail', item_id=random_item.id)
+    else:
         messages.warning(request,'No Items have been added yet.')
-    return redirect('home') 
+        return redirect('home') 
 
 @method_decorator(vendor_check,name='dispatch')
 class AddItem(CreateView):
