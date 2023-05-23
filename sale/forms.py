@@ -22,3 +22,7 @@ class ReviewForm(forms.ModelForm):
     class Meta:
         model = Review
         fields = ['rating', 'audit']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['audit'].label = 'Leave Your Review'

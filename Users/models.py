@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator,MaxValueValidator
 
 class BaseUser(AbstractUser):
 
@@ -10,9 +10,11 @@ class BaseUser(AbstractUser):
     ]
 
     user_type = models.CharField(max_length=2,choices=USER_TYPE_CHOICES,default='CS')
-    name = models.CharField( max_length=100)
-    phone_number = models.CharField(max_length=12)
-    address = models.CharField( max_length=255)
+    email = models.EmailField(unique=True)
+    name = models.CharField(max_length=100)
+    phone_number = models.PositiveIntegerField(
+                                  validators=[MaxValueValidator(limit_value=9999999999,message='Phone Numbers must be atmost 10 digits long')])
+    address = models.CharField(max_length=255)
     balance = models.DecimalField(default=0,
                                   max_digits=19, 
                                   decimal_places=2,

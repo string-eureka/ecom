@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import UserRegisterForm,EditProfileForm
 from .models import BaseUser, CustomerUser, VendorUser
-from django.urls import reverse_lazy
+from django.urls import resolve
 from django.contrib.auth.decorators import login_required
 from .decorators import customer_check,vendor_check
 
@@ -46,11 +46,11 @@ def register(request):
                 address=address,
                 password=password,
             )
-            if request.path == '/register/customer':
+            if resolve(request.path_info).url_name == 'creg':
                 user.user_type = 'CS'  
                 CustomerUser.objects.create(user=user)  
 
-            elif request.path == '/register/vendor':
+            elif resolve(request.path_info).url_name == 'vreg':
                 user.user_type = 'VN'  
                 VendorUser.objects.create(user=user)  
             user.save()

@@ -36,7 +36,10 @@
             </div>
 
             <div class="mt-4">
-              <h3>Total Bill: ${{ order.total_bill }}</h3><br><br>
+              <h3>Total Bill: ${{ order.total_bill }}</h3>
+              {% if order.saving %}
+              <h5>You saved  ${{ order.saving }} with EurekaMart, Yay! </h5><br><br>
+              {% endif %}              
               <h7 class="card-subtitle mb-2 text-muted "> Order delivered at- {{ order.customer.user.address }}</h7>
             </div>
           </div>

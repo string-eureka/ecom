@@ -26,8 +26,8 @@
                 {% endif %}
                 <p class="card-text">Stock: {{ item.item_stock }}</p>
                 <p class="card-text">Orders: {{ item.item_orders }}</p>
-                {% if display_rating  %}
-                <p class="card-text">Rating: {{ display_rating }}/5</p>
+                {% if item.average_rating  %}
+                <p class="card-text">Rating: {{ item.average_rating }}/5</p>
                 {% endif %}
                 {% if user.user_type == 'VN' %}
                 <a class="btn btn-primary" href="{% url 'edit-item' item.pk %}">Edit</a>

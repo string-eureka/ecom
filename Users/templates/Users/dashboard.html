@@ -1,12 +1,18 @@
 {% extends "Users/base.html" %}
 {% block content %}
     <h1>Vendor Dashboard</h1>
-    <h2>To add-</h2> 
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+            <h2 class="card-title">Money Earned on EurekaMart</h2><br>
+            <p class="card-text"><h4>${{ user.balance }}</h4></p>
+            </div>
+        </div>
+    </div>
+    <h2>Items with Low Stock:</h2>
     <ul>
-        <li>Recent Orders</li>
-        <li>Items low on stock</ii>
-        <li> Maybe Graphs?</li>
-        <li> Money Earnt </li>
+        {% for item in low_stock_items %}
+            <li>{{ item.item_title }} - Stock: {{ item.item_stock }}</li>
+        {% endfor %}
     </ul>
-
-{% endblock content %}
+{% endblock %}

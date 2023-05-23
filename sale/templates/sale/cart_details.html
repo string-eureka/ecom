@@ -17,7 +17,11 @@
       <tbody>
         {% for cart_item in cart_items %}
           <tr>
-            <td>{{ cart_item.item.item_title }}</td>
+            {% if cart_item.stock %}
+                <td>{{ cart_item.item.item_title }}</td>
+            {% else %}
+                <td>{{ cart_item.item.item_title }}*</td>
+            {% endif %}
             <td>{{ cart_item.quantity }}</td>
             <td>${{ cart_item.item.selling_price }}</td>
             <td>${{ cart_item.total_iprice }}</td>
@@ -27,9 +31,13 @@
         {% endfor %}
       </tbody>
     </table>
+    <h6 class="card-subtitle mb-2 text-muted text-lg-right">* indicates that the item is out of stock!</h6>
     <h3>Total: ${{ cart.calculate_bill }}</h3>
-    <h5>You saved ${{ saving }} with EurekaMart today, Yay! </h5>
+    {% if cart.savings %}
+    <h5>You will save ${{ cart.savings }} on this order! </h5>
+    {% endif %}
     <a href="{% url 'create-order' %}" class="btn btn-success">Proceed to Checkout</a>
+
   {% else %}
     <p>Your cart is empty.</p>
   {% endif %}

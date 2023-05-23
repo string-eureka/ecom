@@ -16,6 +16,16 @@
 </style>
 <div class="container">
   <h1>User Homepage</h1>
+  <form action="" method="get" class="mb-4">
+    <label for="sort_by">Sort by:</label>
+    <select name="sort_by" id="sort_by" onchange="this.form.submit()">
+      <option value="">Relevance</option>
+      <option value="orders" {% if request.GET.sort_by == 'orders' %}selected{% endif %}>Number of Orders</option>
+      <option value="price_low_high" {% if request.GET.sort_by == 'price_low_high' %}selected{% endif %}>Price (Low to High)</option>
+      <option value="price_high_low" {% if request.GET.sort_by == 'price_high_low' %}selected{% endif %}>Price (High to Low)</option>
+      <option value="average_rating" {% if request.GET.sort_by == 'average_rating' %}selected{% endif %}>Average Rating</option>
+    </select>
+  </form>
   <div class="row">
     {% for item in items %}
     <div class="col-md-4 mb-4">
@@ -31,10 +41,11 @@
           {% else %}
           <p class="card-text">Price: ${{ item.item_price }}</p>
           {% endif %}
-          {% if item.avg_rating  %}
-          <p class="card-text">Rating: {{ item.avg_rating }}/5</p>
+          {% if item.average_rating  %}
+          <p class="card-text">Rating: {{ item.average_rating }}/5</p>
           {% endif %}
-          <a class="btn btn-primary btn-sm" href="{% url 'add-to-cart' item.pk %}">Add to Cart</a>       <a class="btn btn-warning btn-sm" href="{% url 'add-to-wishlist' item.pk %}">Wishlist</a>
+          <a class="btn btn-primary btn-sm" href="{% url 'add-to-cart' item.pk %}">Add to Cart</a>
+          <a class="btn btn-warning btn-sm" href="{% url 'add-to-wishlist' item.pk %}">Wishlist</a>
         </div>
       </div>
     </div>

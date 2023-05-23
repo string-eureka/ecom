@@ -10,7 +10,7 @@ from django.contrib import messages
 from .forms import AddMoneyForm,AddToCartForm,ReviewForm
 from decimal import Decimal, InvalidOperation
 from django.db import transaction
-from django.db.models import F,Avg,Q
+from django.db.models import F,Q,Avg,ExpressionWrapper,DecimalField
 
 
 class VendorCheckMixin(UserPassesTestMixin): 
@@ -37,7 +37,14 @@ class CustomerCheckMixin(UserPassesTestMixin):
 
 @vendor_check
 def dashboard(request):
-    return render(request, 'Users/dashboard.html')
+    low_stock_items = Item.objects.filter(vendor=request.user.id, item_stock__lt=3)
+    
+    context = {
+        'low_stock_items': low_stock_items,
+    }
+
+    return render(request, 'Users/dashboard.html', context=context)
+
     
 
 @vendor_check
@@ -49,10 +56,28 @@ def vendor_items(request):
 
 @customer_check
 def home(request):
-    items = Item.objects.annotate(avg_rating=Avg('item_reviews__rating')).order_by('-item_orders')
-    for item in items:
-        if item.avg_rating is not None:
-            item.avg_rating = Decimal(item.avg_rating).quantize(Decimal('0.00'))
+    sort_by = request.GET.get('sort_by')
+    items = Item.objects.all()
+
+    if sort_by == 'orders':
+        items = items.order_by('-item_orders')
+    elif sort_by == 'price_low_high':
+        items = items.annotate(
+            calculated_selling_price=ExpressionWrapper(
+                F('item_price') - ((F('item_price') * F('item_discount')) / 100),
+                output_field=DecimalField()
+            )
+        ).order_by('calculated_selling_price')
+    elif sort_by == 'price_high_low':
+        items = items.annotate(
+            calculated_selling_price=ExpressionWrapper(
+                F('item_price') - ((F('item_price') * F('item_discount')) / 100),
+                output_field=DecimalField()
+            )
+        ).order_by('-calculated_selling_price')
+    elif sort_by == 'average_rating':
+        items = items.annotate(avg_rating=Avg('item_reviews__rating')).order_by('-avg_rating')
+
     context = {'items': items}
     return render(request, 'Users/home.html', context=context)
 
@@ -61,6 +86,15 @@ def home(request):
 def wallet(request):
     return render(request,'sale/wallet.html')
 
+@customer_check
+def random_item(request):
+    try:
+        random_item = Item.objects.order_by('?').first()  
+        if random_item:
+            return redirect('item-detail', item_id=random_item.id)
+    except Item.DoesNotExist:
+        messages.warning(request,'No Items have been added yet.')
+    return redirect('home') 
 
 @method_decorator(vendor_check,name='dispatch')
 class AddItem(CreateView):
@@ -125,19 +159,16 @@ class AddMoney(FormView):
 @login_required
 def item_detail(request, item_id):
     item = get_object_or_404(Item, pk=item_id)
-    average_rating = item.item_reviews.aggregate(avg_rating=Avg('rating'))['avg_rating']
-    display_rating= Decimal(average_rating).quantize(Decimal('0.00'))
-
     reviews = item.item_reviews.all()
-    review_exists = Review.objects.filter(item=item, owner=request.user.customer).exists()
 
     if request.user.user_type == 'CS':
+        review_exists = Review.objects.filter(item=item, owner=request.user.customer).exists()
         has_ordered = Order.objects.filter(Q(customer=request.user.customer) & Q(order_items__item=item)).exists()
     else:
+        review_exists=False
         has_ordered=False
     context = {
         'item': item,
-        'display_rating': display_rating,
         'reviews': reviews,
         'has_ordered':has_ordered,
         'review_exists':review_exists,
@@ -192,31 +223,34 @@ def remove_from_cart(request, cart_item_id):
 def cart_details(request):
     cart,created = Cart.objects.get_or_create(owner=request.user.customer)
     cart_items = cart.cart_items.all()
-    saving=0
     for cart_item in cart_items:
         cart_item.total_iprice = cart_item.item.selling_price * cart_item.quantity
-        saving+=((cart_item.item.item_price - cart_item.item.selling_price)*cart_item.quantity)
+        if cart_item.item.item_stock < cart_item.quantity:
+            cart_item.stock = 0
+        else: 
+            cart_item.stock = 1
         
     context = {
         'cart': cart,
         'cart_items': cart_items,
-        'saving':saving,
     }
 
     return render(request, 'sale/cart_details.html', context=context)
+
 
 @customer_check
 @transaction.atomic
 
 def create_order(request):
     cart = get_object_or_404(Cart, owner=request.user.customer)
-    total_bill = cart.calculate_bill()
+    total_bill = cart.calculate_bill
+    saving=cart.savings
 
     if request.user.balance < total_bill:
         messages.warning(request, "Insufficient balance to place the order.")
         return redirect('cart-details')
     if total_bill > 10 ** 10:
-        messages.warning(request,'Income tax Bureau Incoming!')
+        messages.warning(request,'In line with government regulations, We are unable to process orders greater than $1000000000!')
         return redirect('cart-details')
 
 
@@ -234,7 +268,7 @@ def create_order(request):
         cart_item.item.item_orders += cart_item.quantity
         cart_item.item.save()
 
-    order = Order.objects.create(customer=request.user.customer, total_bill=total_bill)
+    order = Order.objects.create(customer=request.user.customer, total_bill=total_bill,saving=saving)
     order_items = []
 
     for cart_item in cart.cart_items.all():
@@ -264,7 +298,6 @@ def create_order(request):
 def customer_order_details(request, order_id):
     order = get_object_or_404(Order, pk=order_id, customer=request.user.customer)
     order_items = order.order_items.all()
-    saving=0
     for order_item in order_items:
         order_item.total_iprice = order_item.item_price * order_item.quantity
     context = {
@@ -345,7 +378,7 @@ def leave_review(request, item_id):
     review_exists = Review.objects.filter(item=item, owner=request.user.customer).exists()
     
     if review_exists:
-        messages.error(request, "You have already reviewed this item.")
+        messages.warning(request, "You have already reviewed this item.")
         return redirect('item-detail', item_id=item.id)
 
     if request.method == 'POST':

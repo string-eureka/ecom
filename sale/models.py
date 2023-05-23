@@ -2,6 +2,8 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from PIL import Image
 from Users.models import VendorUser, CustomerUser
+from decimal import Decimal
+from django.db.models import Avg
 
 
 class Item(models.Model):
@@ -32,10 +34,26 @@ class Item(models.Model):
     def selling_price(self):
         return self.item_price - ((self.item_price * self.item_discount) / 100)
     
+    @property
+    def average_rating(self):
+        avg_rating = self.item_reviews.aggregate(Avg('rating')).get('rating__avg')
+        if avg_rating is not None:
+            return Decimal(avg_rating).quantize(Decimal('0.00'))
+        else:
+            return None
+
+    
 
 class Cart(models.Model):
     owner = models.OneToOneField(CustomerUser, on_delete=models.CASCADE, related_name='cart')
     
+    @property
+    def savings(self):
+        cart_items = self.cart_items.all()
+        total_savings = sum((item.item.item_price - item.item.selling_price) * item.quantity for item in cart_items)
+        return total_savings
+    
+    @property
     def calculate_bill(self):
         cart_items = self.cart_items.all()
         total_bill = sum(item.item.selling_price * item.quantity for item in cart_items)
@@ -57,8 +75,8 @@ class CartItem(models.Model):
 class Order(models.Model):
     customer = models.ForeignKey(CustomerUser, on_delete=models.CASCADE, related_name='orders')
     total_bill = models.DecimalField(max_digits=10, decimal_places=2)
+    saving = models.DecimalField(max_digits=10, decimal_places=2)
     order_date = models.DateTimeField(auto_now_add=True)
-    # savings= models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
         return f"Order #{self.pk} by {self.customer}"

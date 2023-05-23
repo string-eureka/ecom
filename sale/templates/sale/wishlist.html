@@ -16,13 +16,19 @@
       <tbody>
         {% for item in items %}
           <tr>
+            {%if item.item_stock %}
             <td>{{ item.item_title }}</td>
+            {% else %}
+            <td>{{ item.item_title }}*</td>
+            {% endif %}
             <td>${{ item.selling_price }}</td>
             <td><a href="{% url 'add-to-cart' item.pk %}" class="btn btn-success btn-sm">Add to Cart</a></td>
             <td><a href="{% url 'remove-from-wishlist' item.pk %}" class="btn btn-danger btn-sm">Remove</a></td>
         {% endfor %}
       </tbody>
     </table>
+    <h6 class="card-subtitle mb-2 text-muted text-lg-right">* indicates that the item is out of stock!</h6>
+
   {% else %}
     <p>Your wishlist is empty.</p>
   {% endif %}

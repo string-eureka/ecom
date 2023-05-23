@@ -65,6 +65,7 @@
                   <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'wallet' %}">Wallet</a></li>
                   <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'customer-order-history' %}">Order History</a></li>
                   <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'wishlist' %}">Wishlist</a></li>
+                  <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'random-item' %}">Random Item</a></li>
                   {% elif user.user_type == 'VN' %}
                   <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'add-item' %}">Add Products</a></li>
                   <li class="list-group-item list-group-item-light"><a class="nav-item nav-link" href="{% url 'vendor-order-history' %}">Orders Recieved</a></li>
