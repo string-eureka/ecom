@@ -27,11 +27,7 @@ class VendorCheckMixin(UserPassesTestMixin):
 @vendor_check
 def dashboard(request):
     low_stock_items = Item.objects.filter(vendor=request.user.id, item_stock__lt=4)
-    
-    context = {
-        'low_stock_items': low_stock_items,
-    }
-
+    context = {'low_stock_items': low_stock_items}
     return render(request, 'Users/dashboard.html', context=context)
 
 @vendor_check
@@ -44,22 +40,15 @@ def vendor_items(request):
 def home(request):
     sort_by = request.GET.get('sort_by')
     items = Item.objects.all()
+
     if sort_by == 'orders':
         items = items.order_by('-item_orders')
     elif sort_by == 'price_low_high':
-        items = items.annotate(
-            calculated_selling_price=ExpressionWrapper(
-                F('item_price') - ((F('item_price') * F('item_discount')) / 100),
-                output_field=DecimalField()
-            )
-        ).order_by('calculated_selling_price')
+        items = items.annotate(calculated_selling_price=ExpressionWrapper(F('item_price') - ((F('item_price') * F('item_discount')) / 100),
+                output_field=DecimalField())).order_by('calculated_selling_price')
     elif sort_by == 'price_high_low':
-        items = items.annotate(
-            calculated_selling_price=ExpressionWrapper(
-                F('item_price') - ((F('item_price') * F('item_discount')) / 100),
-                output_field=DecimalField()
-            )
-        ).order_by('-calculated_selling_price')
+        items = items.annotate(calculated_selling_price=ExpressionWrapper(F('item_price') - ((F('item_price') * F('item_discount')) / 100),
+                output_field=DecimalField())).order_by('-calculated_selling_price')
     elif sort_by == 'average_rating':
         items = items.annotate(avg_rating=Avg('item_reviews__rating')).order_by('-avg_rating')
 
@@ -93,7 +82,6 @@ class AddItem(CreateView):
     def get_success_url(self):
         return reverse('vendor-items')
     
-
 @method_decorator(vendor_check,name='dispatch')
 class EditItem(VendorCheckMixin,UpdateView):
     model = Item
@@ -104,7 +92,6 @@ class EditItem(VendorCheckMixin,UpdateView):
         messages.success(self.request,'Item updated successfully')
         return reverse('vendor-items')
 
-
 @method_decorator(vendor_check,name='dispatch')
 class DeleteItem(VendorCheckMixin,DeleteView):
     model = Item
@@ -113,7 +100,6 @@ class DeleteItem(VendorCheckMixin,DeleteView):
     def get_success_url(self):
         messages.success(self.request,'Item deleted successfully')
         return reverse('vendor-items')
-
 
 @method_decorator(customer_check, name='dispatch')
 class AddMoney(FormView):
@@ -125,7 +111,7 @@ class AddMoney(FormView):
         user = self.request.user
         try:
             new_balance = user.balance + Decimal(balance)
-            if new_balance < 0 or new_balance > 10 ** 17:
+            if new_balance < 0 or new_balance > 10 ** 19:
                 raise InvalidOperation("Invalid balance")
             user.balance = new_balance
             user.save()
@@ -137,7 +123,6 @@ class AddMoney(FormView):
 
     def get_success_url(self):
         return reverse('wallet')
-
 
 @login_required
 def item_detail(request, item_id):

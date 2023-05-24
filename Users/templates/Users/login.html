@@ -1,6 +1,9 @@
 {% extends "Users/base.html" %}
 {% load crispy_forms_tags %}
 {% block content %}
+{% if user.is_authenticated %}
+<h4>You are already authenticated, please <a href ="{% url 'logout' %}">logout</a> before trying to login with another account.</h4>
+{% else %}
     <div class="content-section">
         <form method="POST">
             {% csrf_token %}
@@ -12,10 +15,17 @@
                 <button class="btn btn-outline-info" type="submit">Login</button>
             </div>
         </form>
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <h3>Login with Google</h3>
+                <a href="{% url 'google-login' %}" class="btn btn-primary">Login with Google</a>
+            </div>
+        </div>
         <div class="border-top pt-3">
             <small class="text-muted">
                 Need An Account? <a class="ml-2" href="{% url 'role' %}">Sign Up Now</a>
             </small>
         </div>
     </div>
+{% endif %}
 {% endblock content %}

@@ -43,15 +43,12 @@ class Item(models.Model):
             return None
 
     
-
-    
 class Review(models.Model):
     item=models.ForeignKey(Item,on_delete=models.CASCADE,related_name='item_reviews')
     owner=models.ForeignKey(CustomerUser,on_delete=models.CASCADE,related_name='customer_reviews')
+    audit = models.CharField(max_length=511)
     rating=models.PositiveIntegerField(validators=[MinValueValidator(limit_value=1,message='The Mimimum rating is 1'),
                                                    MaxValueValidator(limit_value=5,message='The Maximum rating is 5 ')])
-    audit = models.CharField(max_length=511)
-
 
     def __str__(self):
         return f"Review by {self.owner} on {self.item}"

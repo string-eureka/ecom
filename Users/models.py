@@ -19,6 +19,7 @@ class BaseUser(AbstractUser):
                                   max_digits=19, 
                                   decimal_places=2,
                                   validators=[MinValueValidator(limit_value=0,message='You must specify a positive amount')])
+    profile_completed = models.BooleanField(default=False)
 
     def __str__(self):  
         return f'[{self.username}]'

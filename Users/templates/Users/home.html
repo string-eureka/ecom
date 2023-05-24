@@ -1,19 +1,5 @@
 {% extends "Users/base.html" %}
 {% block content %}
-<style>
-    .card-img-container {
-        position: relative;
-        width: 100%;
-        padding-bottom: 100%;
-    }
-
-    .card-img-container img {
-        position: absolute;
-        object-fit: cover;
-        width: 100%;
-        height: 100%;
-    }
-</style>
 <div class="container">
   <h1>User Homepage</h1>
   {% if items %}
@@ -55,7 +41,7 @@
   {% else %}
   <p>
     <h3>Just like the old days, there's nobody here.</h3>
-    <h3>Add some items to get the party started!</h3>
+    <h3>Add some items(as a vendor) to get the party started!</h3>
   </p>
   {% endif %}
 </div>

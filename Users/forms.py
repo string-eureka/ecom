@@ -16,3 +16,15 @@ class EditProfileForm(forms.ModelForm):
     class Meta:
         model = BaseUser
         fields = ['name', 'phone_number', 'address']
+
+class UserProfileForm(forms.ModelForm):
+    user_type = forms.ChoiceField(
+        label='User Type',
+        choices=BaseUser.USER_TYPE_CHOICES,
+        widget=forms.RadioSelect,
+        required=True
+    )
+    
+    class Meta:
+        model = BaseUser
+        fields = ['name', 'phone_number', 'address', 'user_type']

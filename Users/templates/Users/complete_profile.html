@@ -1,0 +1,19 @@
+{% extends "Users/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    {% if user.profile_completed %}
+    <h3>Your profile is already complete</h3>
+    {% else %}
+    <div class="content-section">
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                {{ form|crispy }}
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit">Complete Profile</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+{% endblock content %}

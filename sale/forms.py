@@ -1,6 +1,7 @@
 from django import forms
 from Users.models import BaseUser
 from .models import Review
+
 class AddMoneyForm(forms.ModelForm):
     class Meta:
         model = BaseUser
