@@ -6,6 +6,7 @@ from django.contrib import messages
 from .forms import AddToCartForm
 from django.db import transaction
 from django.db.models import F
+from django.core.mail import send_mail
 
 @customer_check
 def add_to_cart(request, item_id):
@@ -100,6 +101,7 @@ def create_order(request):
         cart_item.item.item_orders += cart_item.quantity
         cart_item.item.save()
 
+
     order = Order.objects.create(customer=request.user.customer, total_bill=total_bill,saving=saving)
     order_items = []
 
@@ -118,6 +120,10 @@ def create_order(request):
     for vendor, balance_change in vendor_balances.items():
         vendor.balance = F('balance') + balance_change
         vendor.save()
+            
+        send_mail(subject=f'EurekaMart: New Order Recieved!', from_email='f20221270@pilani.bits-pilani.ac.in',
+                   message=f'You have recieved an order from {request.user.customer} on EurekaMart'
+                   , recipient_list=[cart_item.item.vendor.user.email])
 
     request.user.balance -= total_bill
     request.user.save()
