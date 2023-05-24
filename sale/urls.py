@@ -16,5 +16,7 @@ urlpatterns=[
     path('item/<int:item_id>/', views.item_detail, name='item-detail'),
     path('item/review/<int:item_id>', views.leave_review, name='leave-review'),
     path('item/random/', views.random_item, name='random-item'),
+     path('sales-report/', views.sales_report, name='sales-report'),
+
 ]
 

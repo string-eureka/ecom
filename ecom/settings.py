@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from os import path
 
 from pathlib import Path
-from .keyconfig import secret
+from .keyconfig import secret,dbname,dbpass,dbport,dbuser
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -88,8 +88,12 @@ WSGI_APPLICATION = 'ecom.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': dbname, 
+        'USER': dbuser,
+        'PASSWORD': dbpass,
+        'HOST': '127.0.0.1', 
+        'PORT': dbport,
     }
 }
 
@@ -164,7 +168,7 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-SITE_ID = 3
+SITE_ID = 5
 
 LOGIN_REDIRECT_URL = 'login-redirect'
 LOGOUT_REDIRECT_URL = 'logout'

@@ -11,6 +11,8 @@ from django.contrib import messages
 from .forms import AddMoneyForm,ReviewForm
 from decimal import Decimal, InvalidOperation
 from django.db.models import F,Q,Avg,ExpressionWrapper,DecimalField
+import csv
+from django.http import HttpResponse
 
 
 class VendorCheckMixin(UserPassesTestMixin): 
@@ -111,7 +113,7 @@ class AddMoney(FormView):
         user = self.request.user
         try:
             new_balance = user.balance + Decimal(balance)
-            if new_balance < 0 or new_balance > 10 ** 19:
+            if new_balance < 0 or new_balance > 10 ** 10:
                 raise InvalidOperation("Invalid balance")
             user.balance = new_balance
             user.save()
@@ -169,3 +171,17 @@ def leave_review(request, item_id):
         'form': form,
     }
     return render(request, 'sale/leave_review.html', context)
+
+@login_required
+def sales_report(request):
+    vendor_items = Item.objects.filter(vendor=request.user.vendor)
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="sales_report.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Item Title', 'Price', 'Quantity Sold', 'Total Sales'])
+
+    for item in vendor_items:
+        writer.writerow([item.item_title, item.item_price, item.item_orders, item.item_price * item.item_orders])
+
+    return response

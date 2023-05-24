@@ -16,7 +16,7 @@ class BaseUser(AbstractUser):
                                   validators=[MaxValueValidator(limit_value=9999999999,message='Phone Numbers must be atmost 10 digits long')])
     address = models.CharField(max_length=255)
     balance = models.DecimalField(default=0,
-                                  max_digits=19, 
+                                  max_digits=15, 
                                   decimal_places=2,
                                   validators=[MinValueValidator(limit_value=0,message='You must specify a positive amount')])
     profile_completed = models.BooleanField(default=False)
