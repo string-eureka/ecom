@@ -12,7 +12,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from os import path,getenv
 
 from pathlib import Path
-import dotenv
+import environ
+env = environ.Env()
+environ.Env.read_env()
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -23,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = getenv('SECRET_KEY')
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -88,15 +90,14 @@ WSGI_APPLICATION = 'ecom.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': getenv('DBNAME'), 
-        'USER': getenv('DBUSER'),
-        'PASSWORD': getenv('DBPASS'),
-        'HOST': getenv('DBPORT'), 
-        'PORT': getenv('DBHOST'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': env('DBNAME'),
+        'USER': env('DBUSER'),
+        'PASSWORD': env('DBPASS'),
+        'HOST': env('DBHOST'),
+        'PORT': env('DBPORT'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

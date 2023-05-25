@@ -3,3 +3,7 @@
 db.sqlite3
 keyconfig.py
 media/images/*
+*.pyc
+/env
+*.env
+.vscode
