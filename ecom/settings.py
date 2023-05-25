@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 from os import path,getenv
-
+import os
 from pathlib import Path
 import environ
 env = environ.Env()
@@ -56,6 +56,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -95,7 +96,7 @@ DATABASES = {
         'USER': env('DBUSER'),
         'PASSWORD': env('DBPASS'),
         'HOST': env('DBHOST'),
-        'PORT': env('DBPORT'),
+        'PORT': env('DBPORT')
     }
 }
 
@@ -134,7 +135,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -179,3 +181,6 @@ MAILJET_API_KEY = 'b343f0fd2dea9c3a10523c3475e65d79'
 MAILJET_API_SECRET = '38359069e01ce3d76c53abbe41264281'
 
 EMAIL_BACKEND = 'django_mailjet.backends.MailjetBackend'
+
+if 'WEBSITE_HOSTNAME' in os.environ: # Running on Azure
+    from .azure import *
