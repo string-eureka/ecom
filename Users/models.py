@@ -12,7 +12,7 @@ class BaseUser(AbstractUser):
     user_type = models.CharField(max_length=2,choices=USER_TYPE_CHOICES,default='CS')
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=100)
-    phone_number = models.PositiveIntegerField(null=True,
+    phone_number = models.PositiveBigIntegerField(null=True,
                                   validators=[MaxValueValidator(limit_value=9999999999,message='Phone Numbers must be atmost 10 digits long')])
     address = models.CharField(max_length=255)
     balance = models.DecimalField(default=0,

@@ -1,9 +1,50 @@
 {% extends "Users/base.html" %}
+
 {% block content %}
-{% if user.is_superuser %}
-<h3>You are authorized as an superuser. Please use the admin portal</h3>
-{% else %}
-<h3>Welcome to EurekaMart,the intenet's supreme <br>e-commerce website</h3>
-<h5>Please create an account or login to use our services. Thank You!</h5>
-{% endif %}
+<div class="row">
+  <div class="col-md-9">
+    {% if user.is_superuser %}
+    <h3>You are authorized as a superuser. Please use the admin portal.</h3>
+    {% else %}
+    <h3>Welcome to EurekaMart, the internet's supreme e-commerce website!</h3>
+    <h5>Please create an account or login to use our services. Thank you!</h5><br><br>
+    
+    <h4>Website Features:</h4>
+    <table class="features-table">
+      <thead>
+        <tr>
+          <th>Customer</th>
+          <th>Vendor</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Add money to wallet</td>
+          <td>Add, delete, and sell items</td>
+        </tr>
+        <tr>
+          <td>View order history</td>
+          <td>Provide discounts on items</td>
+        </tr>
+        <tr>
+          <td>Write reviews and give ratings</td>
+          <td>View received orders</td>
+        </tr>
+        <tr>
+          <td>Get random items</td>
+          <td>Seamlessly handle inventory with vendor dashboard</td>
+        </tr>
+        <tr>
+          <td>Sort items by number of orders, ratings, and price</td>
+          <td>Get a CSV report of sales</td>
+        </tr>
+        <tr>
+          <td>Add items to wishlist</td>
+          <td>Receive email notifications for orders</td>
+        </tr>
+      </tbody>
+    </table>
+    {% endif %}
+  </div>
+</div>
 {% endblock content %}

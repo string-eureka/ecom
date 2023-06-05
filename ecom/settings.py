@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-from os import path,getenv
 import os
 from pathlib import Path
 import environ
@@ -52,6 +51,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'import_export',
 ]
 
 MIDDLEWARE = [
@@ -151,8 +151,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 LOGIN_URL = 'login' 
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = path.join(BASE_DIR, 'media')
-
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
@@ -182,5 +181,5 @@ MAILJET_API_SECRET = '38359069e01ce3d76c53abbe41264281'
 
 EMAIL_BACKEND = 'django_mailjet.backends.MailjetBackend'
 
-if 'WEBSITE_HOSTNAME' in os.environ: # Running on Azure
+if 'WEBSITE_HOSTNAME' in os.environ: 
     from .azure import *

@@ -4,7 +4,6 @@ from sale.models import Item
 from Users.decorators import vendor_check,customer_check
 from django.contrib import messages
 from .forms import AddToCartForm
-from django.db import transaction
 from django.db.models import F
 from django.core.mail import send_mail
 
@@ -72,8 +71,6 @@ def cart_details(request):
 
 
 @customer_check
-@transaction.atomic
-
 def create_order(request):
     cart = get_object_or_404(Cart, owner=request.user.customer)
     total_bill = cart.calculate_bill
