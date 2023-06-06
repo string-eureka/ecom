@@ -32,5 +32,3 @@ To get a local copy up and running follow these simple example steps.
    python manage.py createsuperuser
    ```
 6. You'll all set to use EurekaMart!
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
