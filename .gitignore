@@ -2,7 +2,7 @@
 */migrations/0*
 db.sqlite3
 keyconfig.py
-media/images/*
+media/*
 *.pyc
 /env
 *.env

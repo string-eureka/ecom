@@ -20,6 +20,7 @@
                 {% endif %}
                 <p class="card-text">Stock: {{ item.item_stock }}</p>
                 <p class="card-text">Orders: {{ item.item_orders }}</p>
+                <p class="card-text">Sold by: {{ item.vendor.user.username }}</p>
                 {% if item.average_rating  %}
                 <p class="card-text">Rating: {{ item.average_rating }}/5</p>
                 {% endif %}

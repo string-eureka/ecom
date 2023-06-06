@@ -135,8 +135,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = 'media'
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -145,13 +149,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'Users.BaseUser'
 
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
-
-
+LOGIN_REDIRECT_URL = 'login-redirect'
+LOGOUT_REDIRECT_URL = 'logout'
+SOCIALACCOUNT_LOGIN_ON_GET=True
+SOCIAL_AUTH_LOGIN_REDIRECT_URL ='login-redirect'
 LOGIN_URL = 'login' 
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
@@ -170,16 +172,14 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-SITE_ID = 5
+SITE_ID = 7
 
-LOGIN_REDIRECT_URL = 'login-redirect'
-LOGOUT_REDIRECT_URL = 'logout'
-SOCIALACCOUNT_LOGIN_ON_GET=True
-
-MAILJET_API_KEY = 'b343f0fd2dea9c3a10523c3475e65d79'
-MAILJET_API_SECRET = '38359069e01ce3d76c53abbe41264281'
-
+MAILJET_API_KEY = env('MAILJET_API_KEY')
+MAILJET_API_SECRET = env('MAILJET_API_SECRET')
 EMAIL_BACKEND = 'django_mailjet.backends.MailjetBackend'
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = True
 
 if 'WEBSITE_HOSTNAME' in os.environ: 
     from .azure import *

@@ -9,7 +9,7 @@ from django.db.models import Avg
 class Item(models.Model):
     vendor = models.ForeignKey(VendorUser, on_delete=models.CASCADE, related_name='items')
     item_title = models.CharField(max_length=255)
-    item_image = models.ImageField(upload_to='images')
+    item_image = models.ImageField(upload_to='media')
     item_price = models.DecimalField(max_digits=10, decimal_places=2, validators=
                                      [MinValueValidator(limit_value=0, message='You cannot pay to sell your product')])
     item_description = models.CharField(max_length=511)
