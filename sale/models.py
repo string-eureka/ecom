@@ -24,11 +24,11 @@ class Item(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         
-        img = Image.open(self.item_image.path)
+        img = Image.open(self.item_image)
         if img.height > 300 or img.width > 300:
             output_size = (300, 300)
             img.thumbnail(output_size)
-            img.save(self.item_image.path)
+            img.save(self.item_image)
     
     @property
     def selling_price(self):
