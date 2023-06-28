@@ -27,9 +27,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['localhost','eurekamart.me','40.80.89.74']
 
 
 # Application definition
@@ -178,16 +178,16 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-SITE_ID = 5
+SITE_ID = 6
 
 MAILJET_API_KEY = env('MAILJET_API_KEY')
 MAILJET_API_SECRET = env('MAILJET_API_SECRET')
 EMAIL_BACKEND = 'django_mailjet.backends.MailjetBackend'
 
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SESSION_COOKIE_SECURE = True
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# SESSION_COOKIE_SECURE = True
 
 if 'WEBSITE_HOSTNAME' in os.environ: 
     from .azure import *
-CSRF_TRUSTED_ORIGINS = ['http://localhost:1337']
-CORS_ORIGIN_WHITELIST = ['http://localhost:1337']
+CSRF_TRUSTED_ORIGINS = ['http://localhost:1337',"http://eurekamart.me","https://eurekamart.me",'http://eurekamart.me:1337']
+CORS_ORIGIN_WHITELIST = ['http://localhost:1337','http://eurekamart.me:1337',"https://eurekamart.me",'http://eurekamart.me:1337']
