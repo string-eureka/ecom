@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 import environ
+
 env = environ.Env()
 environ.Env.read_env()
 
@@ -24,80 +25,80 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['localhost','eurekamart.me','40.80.89.74']
+ALLOWED_HOSTS = ["localhost", "eurekamart.me", "40.80.89.74"]
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'Users.apps.UsersConfig',
-    'sale.apps.SaleConfig',
-    'orders.apps.OrdersConfig',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'crispy_forms',
-    'crispy_bootstrap4',
-    'django.contrib.sites',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
-    'import_export',
-    'storages',
+    "Users.apps.UsersConfig",
+    "sale.apps.SaleConfig",
+    "orders.apps.OrdersConfig",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "crispy_forms",
+    "crispy_bootstrap4",
+    "django.contrib.sites",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    "import_export",
+    "storages",
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'ecom.urls'
+ROOT_URLCONF = "ecom.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'ecom.wsgi.application'
+WSGI_APPLICATION = "ecom.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DBNAME'),
-        'USER': env('DBUSER'),
-        'PASSWORD': env('DBPASS'),
-        'HOST': env('DBHOST'),
-        'PORT': env('DBPORT')
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": env("DBNAME"),
+        "USER": env("DBUSER"),
+        "PASSWORD": env("DBPASS"),
+        "HOST": env("DBHOST"),
+        "PORT": env("DBPORT"),
     }
 }
 
@@ -106,16 +107,16 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -123,9 +124,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -135,59 +136,69 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-DEFAULT_FILE_STORAGE = 'ecom.custom_azure.AzureMediaStorage'
-STATICFILES_STORAGE = 'ecom.custom_azure.AzureStaticStorage'
+DEFAULT_FILE_STORAGE = "ecom.custom_azure.AzureMediaStorage"
+STATICFILES_STORAGE = "ecom.custom_azure.AzureStaticStorage"
 
 STATIC_LOCATION = "static"
 MEDIA_LOCATION = "media"
 
-AZURE_ACCOUNT_NAME =  env('AZURE_ACCOUNT_NAME')
-AZURE_CUSTOM_DOMAIN = f'{AZURE_ACCOUNT_NAME}.blob.core.windows.net'
-STATIC_URL = f'https://{AZURE_CUSTOM_DOMAIN}/{STATIC_LOCATION}/'
-MEDIA_URL = f'https://{AZURE_CUSTOM_DOMAIN}/{MEDIA_LOCATION}/'
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
+AZURE_ACCOUNT_NAME = env("AZURE_ACCOUNT_NAME")
+AZURE_CUSTOM_DOMAIN = f"{AZURE_ACCOUNT_NAME}.blob.core.windows.net"
+STATIC_URL = f"https://{AZURE_CUSTOM_DOMAIN}/{STATIC_LOCATION}/"
+MEDIA_URL = f"https://{AZURE_CUSTOM_DOMAIN}/{MEDIA_LOCATION}/"
+CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-AUTH_USER_MODEL = 'Users.BaseUser'
+AUTH_USER_MODEL = "Users.BaseUser"
 
-LOGIN_REDIRECT_URL = 'login-redirect'
-LOGOUT_REDIRECT_URL = 'logout'
-SOCIALACCOUNT_LOGIN_ON_GET=True
-SOCIAL_AUTH_LOGIN_REDIRECT_URL ='login-redirect'
-LOGIN_URL = 'login' 
+LOGIN_REDIRECT_URL = "login-redirect"
+LOGOUT_REDIRECT_URL = "logout"
+SOCIALACCOUNT_LOGIN_ON_GET = True
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = "login-redirect"
+LOGIN_URL = "login"
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend'
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': [
-            'profile',
-            'email',
+    "google": {
+        "SCOPE": [
+            "profile",
+            "email",
         ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
-        }
+        "AUTH_PARAMS": {
+            "access_type": "online",
+        },
     }
 }
 
 SITE_ID = 6
 
-MAILJET_API_KEY = env('MAILJET_API_KEY')
-MAILJET_API_SECRET = env('MAILJET_API_SECRET')
-EMAIL_BACKEND = 'django_mailjet.backends.MailjetBackend'
+MAILJET_API_KEY = env("MAILJET_API_KEY")
+MAILJET_API_SECRET = env("MAILJET_API_SECRET")
+EMAIL_BACKEND = "django_mailjet.backends.MailjetBackend"
 
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # SESSION_COOKIE_SECURE = True
 
-if 'WEBSITE_HOSTNAME' in os.environ: 
+if "WEBSITE_HOSTNAME" in os.environ:
     from .azure import *
-CSRF_TRUSTED_ORIGINS = ['http://localhost:1337',"http://eurekamart.me","https://eurekamart.me",'http://eurekamart.me:1337']
-CORS_ORIGIN_WHITELIST = ['http://localhost:1337','http://eurekamart.me:1337',"https://eurekamart.me",'http://eurekamart.me:1337']
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:1337",
+    "http://eurekamart.me",
+    "https://eurekamart.me",
+    "http://eurekamart.me:1337",
+]
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost:1337",
+    "http://eurekamart.me:1337",
+    "https://eurekamart.me",
+    "http://eurekamart.me:1337",
+]
